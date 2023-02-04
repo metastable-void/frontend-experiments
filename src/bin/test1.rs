@@ -13,12 +13,12 @@ enum MyAction {
     Decrement,
 }
 
-async fn subscriber(state: &MyState) {
+async fn subscriber(state: MyState) {
     println!("State changed: {:?}", state);
 }
 
-async fn another_subscriber(state: &MyState) {
-    println!("State changed: {:?}", state);
+async fn another_subscriber(state: MyState) {
+    println!("State changed, haha: {:?}", state);
 }
 
 #[tokio::main]
@@ -32,8 +32,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     );
-    store.subscribe(Box::new(|state| -> Box<dyn Future<Output = ()>> { Box::new(subscriber(state)) })).await;
-    // store.subscribe(Box::new(|state| -> Box<dyn Future<Output = ()>> { Box::new(another_subscriber(state)) })).await;
+    store.subscribe(Box::new(|state: &MyState| -> Box<dyn Future<Output = ()>> { Box::new(subscriber(state.clone())) })).await;
+    store.subscribe(Box::new(|state: &MyState| -> Box<dyn Future<Output = ()>> { Box::new(another_subscriber(state.clone())) })).await;
     store.dispatch(MyAction::Increment).await;
     store.dispatch(MyAction::Increment).await;
     store.dispatch(MyAction::Decrement).await;
