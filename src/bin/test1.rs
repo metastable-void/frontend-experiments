@@ -1,6 +1,5 @@
 
-use std::future::Future;
-use frontend_experiments::{Store};
+use frontend_experiments::{Store, BoxedEmptyFuture};
 
 #[derive(Clone, Debug)]
 struct MyState {
@@ -32,8 +31,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     );
-    store.subscribe(Box::new(|state: &MyState| -> Box<dyn Future<Output = ()>> { Box::new(subscriber(state.clone())) })).await;
-    store.subscribe(Box::new(|state: &MyState| -> Box<dyn Future<Output = ()>> { Box::new(another_subscriber(state.clone())) })).await;
+    store.subscribe(Box::new(|state: &MyState| -> BoxedEmptyFuture { Box::new(subscriber(state.clone())) })).await;
+    store.subscribe(Box::new(|state: &MyState| -> BoxedEmptyFuture { Box::new(another_subscriber(state.clone())) })).await;
     store.dispatch(MyAction::Increment).await;
     store.dispatch(MyAction::Increment).await;
     store.dispatch(MyAction::Decrement).await;

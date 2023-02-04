@@ -2,17 +2,19 @@
 use std::future::Future;
 use std::pin::Pin;
 
+pub type BoxedEmptyFuture = Box<dyn Future<Output = ()>>;
+
 pub type Reducer<State, Action> = fn(&State, Action) -> State;
 
 pub trait Subscriber<State> {
-    fn call(&self, state: &State) -> Box<dyn Future<Output = ()>>;
+    fn call(&self, state: &State) -> BoxedEmptyFuture;
 }
 
 impl<State, F> Subscriber<State> for F
 where
-    F: Fn(&State) -> Box<dyn Future<Output = ()>>,
+    F: Fn(&State) -> BoxedEmptyFuture,
 {
-    fn call(&self, state: &State) -> Box<dyn Future<Output = ()>> {
+    fn call(&self, state: &State) -> BoxedEmptyFuture {
         self(state)
     }
 }
