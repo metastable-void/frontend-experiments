@@ -1,4 +1,5 @@
 
+use std::future::Future;
 use frontend_experiments::{Store};
 
 #[derive(Clone, Debug)]
@@ -31,8 +32,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     );
-    store.subscribe(Box::new(|state| Box::new(subscriber(state)))).await;
-    store.subscribe(Box::new(|state| Box::new(another_subscriber(state)))).await;
+    store.subscribe(Box::new(|state| -> Box<dyn Future<Output = ()>> { Box::new(subscriber(state)) })).await;
+    // store.subscribe(Box::new(|state| -> Box<dyn Future<Output = ()>> { Box::new(another_subscriber(state)) })).await;
     store.dispatch(MyAction::Increment).await;
     store.dispatch(MyAction::Increment).await;
     store.dispatch(MyAction::Decrement).await;
