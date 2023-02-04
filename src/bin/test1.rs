@@ -31,8 +31,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     );
-    store.subscribe(Box::new(|state: &MyState| -> BoxedEmptyFuture { Box::new(subscriber(state.clone())) })).await;
-    store.subscribe(Box::new(|state: &MyState| -> BoxedEmptyFuture { Box::new(another_subscriber(state.clone())) })).await;
+    store.subscribe(Box::new(|state: MyState| -> BoxedEmptyFuture { Box::new(subscriber(state)) })).await;
+    store.subscribe(Box::new(|state: MyState| -> BoxedEmptyFuture { Box::new(another_subscriber(state)) })).await;
     store.dispatch(MyAction::Increment).await;
     store.dispatch(MyAction::Increment).await;
     store.dispatch(MyAction::Decrement).await;
