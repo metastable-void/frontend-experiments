@@ -16,8 +16,10 @@ async fn subscriber(state: MyState) {
     println!("State changed: {:?}", state);
 }
 
-async fn another_subscriber(state: MyState) {
-    println!("State changed, haha: {:?}", state);
+fn yet_another_subscriber(state: MyState) -> BoxedEmptyFuture {
+    Box::new(async move {
+        println!("State changed, haha: {:?}", state);
+    })
 }
 
 #[tokio::main]
@@ -32,7 +34,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     );
     store.subscribe(Box::new(|state: MyState| -> BoxedEmptyFuture { Box::new(subscriber(state)) })).await;
-    store.subscribe(Box::new(|state: MyState| -> BoxedEmptyFuture { Box::new(another_subscriber(state)) })).await;
+    store.subscribe(Box::new(yet_another_subscriber)).await;
     store.dispatch(MyAction::Increment).await;
     store.dispatch(MyAction::Increment).await;
     store.dispatch(MyAction::Decrement).await;
